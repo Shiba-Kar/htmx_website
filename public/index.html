@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alex Mercer | Systems & Hypermedia Architect</title>
+  <meta name="description" content="Personal developer portfolio of Alex Mercer. Systems Programmer, Rust & Go Specialist, and Hypermedia HTMX advocate.">
+  
+  <!-- CSS Design System -->
+  <link rel="stylesheet" href="/css/styles.css">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- HTMX Core Engine -->
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body>
+
+  <!-- Particle Backdrop Canvas -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- Navigation Bar -->
+  <header class="navbar">
+    <div class="container nav-container">
+      <a href="#" class="brand-logo">
+        <div class="logo-icon"><i class="fa-solid fa-code"></i></div>
+        <span>Alex<span class="gradient-text">Mercer</span></span>
+      </a>
+
+      <nav>
+        <ul class="nav-links">
+          <li><a href="#about" class="nav-link">About</a></li>
+          <li><a href="#code" class="nav-link">Playground</a></li>
+          <li><a href="#projects" class="nav-link">Projects</a></li>
+          <li><a href="#skills" class="nav-link">Skills</a></li>
+          <li><a href="#articles" class="nav-link">Articles</a></li>
+          <li><a href="#contact" class="nav-link">Contact</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="https://github.com/bigskysoftware/htmx" target="_blank" rel="noopener" class="btn btn-icon" title="View HTMX Repository">
+          <i class="fa-brands fa-github"></i>
+        </a>
+        <a href="#contact" class="btn btn-primary btn-sm">
+          <i class="fa-solid fa-paper-plane"></i> Get in Touch
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Shell -->
+  <main>
+
+    <!-- Hero Section -->
+    <section class="hero" id="about">
+      <div class="container hero-grid">
+        <div class="hero-content">
+          <div class="hero-pill">
+            <span class="pulse-dot"></span>
+            <span>Hypermedia & Systems Engineer</span>
+          </div>
+
+          <h1 class="hero-title">
+            Architecting <span class="gradient-text">Fast & Server-Driven</span> Digital Systems
+          </h1>
+
+          <p class="hero-subtitle">
+            I craft high-performance distributed backends in <strong>Rust & Go</strong>, and responsive zero-bloat web applications powered by <strong>HTMX</strong> hypermedia architecture.
+          </p>
+
+          <div class="hero-cta">
+            <a href="#projects" class="btn btn-primary">
+              <i class="fa-solid fa-rocket"></i> Explore Projects
+            </a>
+            <a href="#code" class="btn btn-secondary">
+              <i class="fa-solid fa-terminal"></i> Try Code Playground
+            </a>
+          </div>
+
+          <!-- Live Stats HTMX Bar -->
+          <div class="live-stats-bar" hx-get="/api/stats" hx-trigger="load, every 15s" hx-swap="innerHTML">
+            <div class="stat-pill"><i class="fa-solid fa-code-commit"></i> <strong>1,480+</strong> Commits</div>
+            <div class="stat-pill"><i class="fa-solid fa-circle-up"></i> <strong>99.99%</strong> Uptime</div>
+            <div class="stat-pill"><i class="fa-solid fa-diagram-project"></i> <strong>14</strong> Repos</div>
+            <div class="stat-pill live-now"><span class="pulse-dot"></span> Initializing HTMX...</div>
+          </div>
+        </div>
+
+        <!-- Interactive Terminal Component -->
+        <div class="hero-terminal" id="code">
+          <div class="terminal-window">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <span class="dot dot-red"></span>
+                <span class="dot dot-yellow"></span>
+                <span class="dot dot-green"></span>
+              </div>
+              <div class="terminal-tabs">
+                <button class="terminal-tab active" hx-get="/api/code-snippet/htmx" hx-target="#terminal-snippet" hx-swap="innerHTML">HTMX</button>
+                <button class="terminal-tab" hx-get="/api/code-snippet/rust" hx-target="#terminal-snippet" hx-swap="innerHTML">Rust</button>
+                <button class="terminal-tab" hx-get="/api/code-snippet/python" hx-target="#terminal-snippet" hx-swap="innerHTML">Python</button>
+                <button class="terminal-tab" hx-get="/api/code-snippet/go" hx-target="#terminal-snippet" hx-swap="innerHTML">Go</button>
+              </div>
+            </div>
+            <div id="terminal-snippet" hx-get="/api/code-snippet/htmx" hx-trigger="load" hx-swap="innerHTML">
+              <!-- Initial snippet loaded via HTMX -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects Section with Active Search & Category Filter -->
+    <section class="section" id="projects">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Portfolio Showcase</span>
+          <h2 class="section-title">Featured Projects</h2>
+          <p class="section-desc">Real-time filtered view powered by HTMX server endpoints (`hx-get` with keyup delay search).</p>
+        </div>
+
+        <!-- Active Filter & Search Control Bar -->
+        <div class="project-filters">
+          <div class="filter-row">
+            <!-- HTMX Active Search Input -->
+            <div class="search-input-wrapper">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" 
+                     name="query" 
+                     placeholder="Search projects by title, tech stack (Rust, HTMX, Go)..." 
+                     hx-get="/api/projects" 
+                     hx-trigger="keyup changed delay:250ms, search" 
+                     hx-target="#project-grid" 
+                     hx-include="[name='category']"
+                     hx-indicator="#projects-spinner"
+                     class="search-input" />
+            </div>
+
+            <div id="projects-spinner" class="htmx-indicator spinner"></div>
+          </div>
+
+          <!-- HTMX Category Filter Tabs -->
+          <div class="category-tabs">
+            <button class="cat-btn active" hx-get="/api/projects?category=all" hx-target="#project-grid" hx-indicator="#projects-spinner">All Systems</button>
+            <button class="cat-btn" hx-get="/api/projects?category=backend" hx-target="#project-grid" hx-indicator="#projects-spinner">Backend Engine</button>
+            <button class="cat-btn" hx-get="/api/projects?category=fullstack" hx-target="#project-grid" hx-indicator="#projects-spinner">HTMX / Hypermedia</button>
+            <button class="cat-btn" hx-get="/api/projects?category=devops" hx-target="#project-grid" hx-indicator="#projects-spinner">DevOps & Edge</button>
+            <button class="cat-btn" hx-get="/api/projects?category=ai/ml" hx-target="#project-grid" hx-indicator="#projects-spinner">AI / Machine Learning</button>
+          </div>
+        </div>
+
+        <!-- Dynamic HTMX Project Cards Grid Target -->
+        <div id="project-grid" 
+             hx-get="/api/projects" 
+             hx-trigger="load" 
+             hx-swap="innerHTML" 
+             class="projects-grid">
+          <!-- Server renders project cards partial here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Skills Matrix Section -->
+    <section class="section" id="skills">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Capabilities</span>
+          <h2 class="section-title">Technical Expertise</h2>
+          <p class="section-desc">Interactive tabbed skills matrix swapping server partials on demand.</p>
+        </div>
+
+        <!-- Skills Navigation Tabs -->
+        <div class="skills-nav">
+          <button class="skills-tab-btn active" hx-get="/api/skills?category=frontend" hx-target="#skills-grid-target" hx-swap="innerHTML">
+            <i class="fa-solid fa-code"></i> Frontend & Hypermedia
+          </button>
+          <button class="skills-tab-btn" hx-get="/api/skills?category=backend" hx-target="#skills-grid-target" hx-swap="innerHTML">
+            <i class="fa-solid fa-server"></i> Backend & Distributed
+          </button>
+          <button class="skills-tab-btn" hx-get="/api/skills?category=devops" hx-target="#skills-grid-target" hx-swap="innerHTML">
+            <i class="fa-solid fa-cloud"></i> DevOps & Cloud
+          </button>
+          <button class="skills-tab-btn" hx-get="/api/skills?category=architecture" hx-target="#skills-grid-target" hx-swap="innerHTML">
+            <i class="fa-solid fa-sitemap"></i> System Architecture
+          </button>
+        </div>
+
+        <!-- Skills Grid Target -->
+        <div id="skills-grid-target" hx-get="/api/skills?category=frontend" hx-trigger="load" hx-swap="innerHTML">
+          <!-- Server renders skill matrix partial here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Articles & Technical Writings Section -->
+    <section class="section" id="articles">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-tag">Publications</span>
+          <h2 class="section-title">Technical Essays & Articles</h2>
+          <p class="section-desc">Infinite pagination powered by HTMX (`hx-get="/api/articles?page=..."`).</p>
+        </div>
+
+        <!-- Articles Feed Target -->
+        <div id="articles-feed" class="articles-feed" hx-get="/api/articles?page=1" hx-trigger="load" hx-swap="innerHTML">
+          <!-- Initial articles list loaded via HTMX -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Form Section -->
+    <section class="section" id="contact">
+      <div class="container">
+        <div class="contact-container">
+          <div class="contact-info">
+            <span class="section-tag">Let's Connect</span>
+            <h3>Start a Conversation</h3>
+            <p>Interested in collaborating on high-throughput backend architecture, Rust/Go systems, or hypermedia-driven web applications?</p>
+
+            <div class="contact-methods">
+              <div class="method-item">
+                <div class="method-icon"><i class="fa-solid fa-envelope"></i></div>
+                <div class="method-text">
+                  <h5>Direct Email</h5>
+                  <p>alex.mercer@dev-architect.io</p>
+                </div>
+              </div>
+
+              <div class="method-item">
+                <div class="method-icon"><i class="fa-brands fa-github"></i></div>
+                <div class="method-text">
+                  <h5>GitHub Profile</h5>
+                  <p>github.com/bigskysoftware/htmx</p>
+                </div>
+              </div>
+
+              <div class="method-item">
+                <div class="method-icon"><i class="fa-solid fa-location-dot"></i></div>
+                <div class="method-text">
+                  <h5>Location</h5>
+                  <p>San Francisco, CA (Available Remote Worldwide)</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Asynchronous HTMX Form -->
+          <form id="contact-form" 
+                hx-post="/api/contact" 
+                hx-target="#contact-response" 
+                hx-indicator="#form-spinner" 
+                class="contact-form">
+            
+            <div id="contact-response"></div>
+
+            <div class="form-group">
+              <label for="name">Your Name</label>
+              <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Sarah Connor" required />
+            </div>
+
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" name="email" class="form-control" placeholder="e.g. sarah@cyberdyne.com" required />
+            </div>
+
+            <div class="form-group">
+              <label for="subject">Subject</label>
+              <input type="text" id="subject" name="subject" class="form-control" placeholder="Project Consulting / Architecture" />
+            </div>
+
+            <div class="form-group">
+              <label for="message">Message</label>
+              <textarea id="message" name="message" class="form-control" placeholder="Tell me about your project scope..." required></textarea>
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+              <span>Send Message</span>
+              <i class="fa-solid fa-paper-plane"></i>
+              <span id="form-spinner" class="htmx-indicator spinner"></span>
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal Container Root (HTMX swaps detail dialogs here) -->
+  <div id="modal-container"></div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container footer-content">
+      <div>
+        <p>&copy; 2026 Alex Mercer. Built with HTML5, Vanilla CSS, and <a href="https://htmx.org" target="_blank" style="color: var(--accent-cyan);">HTMX</a>.</p>
+      </div>
+
+      <div class="footer-socials">
+        <a href="https://github.com/bigskysoftware/htmx" target="_blank" rel="noopener" class="btn btn-icon" title="GitHub">
+          <i class="fa-brands fa-github"></i>
+        </a>
+        <a href="https://twitter.com" target="_blank" rel="noopener" class="btn btn-icon" title="Twitter / X">
+          <i class="fa-brands fa-x-twitter"></i>
+        </a>
+        <a href="https://linkedin.com" target="_blank" rel="noopener" class="btn btn-icon" title="LinkedIn">
+          <i class="fa-brands fa-linkedin"></i>
+        </a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Custom Client Script -->
+  <script src="/js/main.js"></script>
+</body>
+</html>
