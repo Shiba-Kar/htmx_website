@@ -3,3 +3,4 @@ node_modules/
 *.log
 .env
 bun.lock
+package-lock.json
