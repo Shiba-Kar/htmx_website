@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Alex Mercer | Systems & Hypermedia Architect</title>
-  <meta name="description" content="Personal developer portfolio of Alex Mercer. Systems Programmer, Rust & Go Specialist, and Hypermedia HTMX advocate.">
+  <title>Alex Mercer | Systems & Alpine.js Architect</title>
+  <meta name="description" content="Personal developer portfolio of Alex Mercer. Systems Programmer, Rust & Go Specialist, and Alpine.js advocate.">
   
   <!-- CSS Design System -->
   <link rel="stylesheet" href="/css/styles.css">
@@ -12,10 +12,14 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
-  <!-- HTMX Core Engine -->
-  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+  <!-- Alpine.js Reactive Engine -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  
+  <style>
+    [x-cloak] { display: none !important; }
+  </style>
 </head>
-<body>
+<body x-data="portfolioApp()">
 
   <!-- Custom Dual-Ring Neon Cursor -->
   <div class="custom-cursor" id="custom-cursor"></div>
@@ -46,10 +50,10 @@
       <div class="nav-actions">
         <!-- Live Accent Theme Switcher -->
         <div class="theme-picker" title="Switch Accent Theme">
-          <div class="theme-dot cyan" data-theme-name="cyan" title="Cyber Cyan"></div>
-          <div class="theme-dot magenta" data-theme-name="magenta" title="Neon Magenta"></div>
-          <div class="theme-dot emerald" data-theme-name="emerald" title="Matrix Emerald"></div>
-          <div class="theme-dot amber" data-theme-name="amber" title="Solar Amber"></div>
+          <div class="theme-dot cyan" @click="setTheme('cyan')" title="Cyber Cyan"></div>
+          <div class="theme-dot magenta" @click="setTheme('magenta')" title="Neon Magenta"></div>
+          <div class="theme-dot emerald" @click="setTheme('emerald')" title="Matrix Emerald"></div>
+          <div class="theme-dot amber" @click="setTheme('amber')" title="Solar Amber"></div>
         </div>
 
         <!-- Web Audio Interface Sound Toggle -->
@@ -76,7 +80,7 @@
         <div class="hero-content">
           <div class="hero-pill">
             <span class="pulse-dot"></span>
-            <span>Hypermedia & Systems Architect</span>
+            <span>Reactive Alpine.js & Systems Architect</span>
           </div>
 
           <h1 class="hero-title">
@@ -85,7 +89,7 @@
           </h1>
 
           <p class="hero-subtitle">
-            I craft high-throughput distributed backends in <strong>Rust & Go</strong>, and responsive zero-bloat web applications powered by <strong>HTMX</strong> hypermedia architecture.
+            I craft high-throughput distributed backends in <strong>Go & Rust</strong>, and responsive zero-bloat web applications powered by <strong>Alpine.js</strong> reactive architecture.
           </p>
 
           <div class="hero-cta">
@@ -97,17 +101,17 @@
             </a>
           </div>
 
-          <!-- Live Stats HTMX Bar -->
-          <div class="live-stats-bar" hx-get="/api/stats" hx-trigger="load, every 15s" hx-swap="innerHTML">
-            <div class="stat-pill"><i class="fa-solid fa-code-commit"></i> <strong>1,480+</strong> Commits</div>
-            <div class="stat-pill"><i class="fa-solid fa-circle-up"></i> <strong>99.99%</strong> Uptime</div>
-            <div class="stat-pill"><i class="fa-solid fa-diagram-project"></i> <strong>14</strong> Repos</div>
-            <div class="stat-pill live-now"><span class="pulse-dot"></span> Initializing HTMX...</div>
+          <!-- Live Stats Bar (Alpine.js Polling) -->
+          <div class="live-stats-bar" x-data="statsApp()" x-init="initStats()">
+            <div class="stat-pill"><i class="fa-solid fa-code-commit"></i> <strong x-text="stats.commits || 1480">1,480</strong> Commits</div>
+            <div class="stat-pill"><i class="fa-solid fa-circle-up"></i> <strong x-text="stats.uptime || '99.99%'">99.99%</strong> Go Server Uptime</div>
+            <div class="stat-pill"><i class="fa-solid fa-diagram-project"></i> <strong x-text="stats.activeProjects || 14">14</strong> Active Repos</div>
+            <div class="stat-pill live-now"><span class="pulse-dot"></span> Live Alpine.js Stream</div>
           </div>
         </div>
 
-        <!-- Interactive Terminal Component -->
-        <div class="hero-terminal" id="code">
+        <!-- Interactive Terminal Component (Alpine.js State) -->
+        <div class="hero-terminal" id="code" x-data="terminalApp()" x-init="fetchSnippet('alpine')">
           <div class="terminal-window">
             <div class="terminal-header">
               <div class="terminal-dots">
@@ -116,126 +120,206 @@
                 <span class="dot dot-green"></span>
               </div>
               <div class="terminal-tabs">
-                <button class="terminal-tab active" hx-get="/api/code-snippet/htmx" hx-target="#terminal-snippet" hx-swap="innerHTML">HTMX</button>
-                <button class="terminal-tab" hx-get="/api/code-snippet/rust" hx-target="#terminal-snippet" hx-swap="innerHTML">Rust</button>
-                <button class="terminal-tab" hx-get="/api/code-snippet/python" hx-target="#terminal-snippet" hx-swap="innerHTML">Python</button>
-                <button class="terminal-tab" hx-get="/api/code-snippet/go" hx-target="#terminal-snippet" hx-swap="innerHTML">Go</button>
+                <button class="terminal-tab" :class="{ 'active': activeLang === 'alpine' }" @click="selectLang('alpine')">Alpine.js</button>
+                <button class="terminal-tab" :class="{ 'active': activeLang === 'go' }" @click="selectLang('go')">Go</button>
+                <button class="terminal-tab" :class="{ 'active': activeLang === 'rust' }" @click="selectLang('rust')">Rust</button>
+                <button class="terminal-tab" :class="{ 'active': activeLang === 'python' }" @click="selectLang('python')">Python</button>
               </div>
             </div>
-            <div id="terminal-snippet" hx-get="/api/code-snippet/htmx" hx-trigger="load" hx-swap="innerHTML">
-              <!-- Initial snippet loaded via HTMX -->
+            <div class="terminal-content" x-show="snippet">
+              <div class="terminal-subheader">
+                <span class="file-name"><i class="fa-regular fa-file-code"></i> <span x-text="snippet.filename">active_search.html</span></span>
+                <span class="file-tag" x-text="snippet.lang">HTML / Alpine.js</span>
+              </div>
+              <pre class="terminal-code"><code x-text="snippet.code"></code></pre>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Projects Section with Active Search & Category Filter -->
-    <section class="section" id="projects">
+    <!-- Projects Section with Active Search & Category Filter (Alpine.js State) -->
+    <section class="section" id="projects" x-data="projectsApp()" x-init="fetchProjects()">
       <div class="container">
         <div class="section-header">
           <span class="section-tag">Portfolio Showcase</span>
           <h2 class="section-title glitch-hover" data-text="Featured Projects">Featured Projects</h2>
-          <p class="section-desc">Real-time reactive view powered by HTMX server endpoints (`hx-get` with keyup delay search).</p>
+          <p class="section-desc">Real-time reactive view powered by Alpine.js data directives (`x-model.debounce` & Go JSON APIs).</p>
         </div>
 
         <!-- Active Filter & Search Control Bar -->
         <div class="project-filters">
           <div class="filter-row">
-            <!-- HTMX Active Search Input -->
+            <!-- Active Search Input -->
             <div class="search-input-wrapper">
               <i class="fa-solid fa-magnifying-glass"></i>
               <input type="text" 
-                     name="query" 
-                     placeholder="Search projects by title, tech stack (Rust, HTMX, Go)..." 
-                     hx-get="/api/projects" 
-                     hx-trigger="keyup changed delay:250ms, search" 
-                     hx-target="#project-grid" 
-                     hx-include="[name='category']"
-                     hx-indicator="#projects-spinner"
+                     x-model.debounce.250ms="query" 
+                     placeholder="Search projects by title, tech stack (Rust, Alpine.js, Go)..." 
                      class="search-input" />
             </div>
 
-            <div id="projects-spinner" class="htmx-indicator spinner"></div>
+            <div class="htmx-indicator spinner" x-show="loading" x-cloak></div>
           </div>
 
-          <!-- HTMX Category Filter Tabs -->
+          <!-- Category Filter Tabs -->
           <div class="category-tabs">
-            <button class="cat-btn active" hx-get="/api/projects?category=all" hx-target="#project-grid" hx-indicator="#projects-spinner">All Systems</button>
-            <button class="cat-btn" hx-get="/api/projects?category=backend" hx-target="#project-grid" hx-indicator="#projects-spinner">Backend Engine</button>
-            <button class="cat-btn" hx-get="/api/projects?category=fullstack" hx-target="#project-grid" hx-indicator="#projects-spinner">HTMX / Hypermedia</button>
-            <button class="cat-btn" hx-get="/api/projects?category=devops" hx-target="#project-grid" hx-indicator="#projects-spinner">DevOps & Edge</button>
-            <button class="cat-btn" hx-get="/api/projects?category=ai/ml" hx-target="#project-grid" hx-indicator="#projects-spinner">AI / Machine Learning</button>
+            <button class="cat-btn" :class="{ 'active': category === 'all' }" @click="setCategory('all')">All Systems</button>
+            <button class="cat-btn" :class="{ 'active': category === 'backend' }" @click="setCategory('backend')">Backend Engine</button>
+            <button class="cat-btn" :class="{ 'active': category === 'fullstack' }" @click="setCategory('fullstack')">Alpine / Hypermedia</button>
+            <button class="cat-btn" :class="{ 'active': category === 'devops' }" @click="setCategory('devops')">DevOps & Edge</button>
+            <button class="cat-btn" :class="{ 'active': category === 'ai/ml' }" @click="setCategory('ai/ml')">AI / Machine Learning</button>
           </div>
         </div>
 
-        <!-- Dynamic HTMX Project Cards Grid Target -->
-        <div id="project-grid" 
-             hx-get="/api/projects" 
-             hx-trigger="load" 
-             hx-swap="innerHTML" 
-             class="projects-grid">
-          <!-- Server renders project cards partial here -->
+        <!-- Projects Grid Container (Alpine.js Loop) -->
+        <div class="projects-grid">
+          <template x-for="project in projects" :key="project.id">
+            <article class="project-card spotlight-card" :id="'project-' + project.id">
+              <div class="card-image-wrapper">
+                <img :src="project.image" :alt="project.title" loading="lazy" />
+                <div class="card-badge" x-text="project.category"></div>
+              </div>
+              <div class="card-content">
+                <div class="card-meta">
+                  <span><i class="fa-regular fa-star"></i> <span x-text="project.stars"></span></span>
+                  <span><i class="fa-solid fa-code-fork"></i> <span x-text="project.forks"></span></span>
+                  <span class="metric-pill"><i class="fa-solid fa-bolt"></i> <span x-text="project.metrics"></span></span>
+                </div>
+                <h3 class="card-title" x-text="project.title"></h3>
+                <p class="card-summary" x-text="project.summary"></p>
+                <div class="card-tags">
+                  <template x-for="tag in project.tags" :key="tag">
+                    <span class="tag" x-text="tag"></span>
+                  </template>
+                </div>
+                <div class="card-actions">
+                  <button class="btn btn-secondary btn-sm" @click="$dispatch('open-modal', project.id)">
+                    <i class="fa-solid fa-expand"></i> Details
+                  </button>
+                  <a :href="project.githubUrl" target="_blank" rel="noopener" class="btn btn-icon btn-sm" title="View Source Code">
+                    <i class="fa-brands fa-github"></i>
+                  </a>
+                  <a :href="project.liveUrl" target="_blank" rel="noopener" class="btn btn-icon btn-sm" title="Live Preview">
+                    <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                  </a>
+                </div>
+              </div>
+            </article>
+          </template>
+
+          <template x-if="projects.length === 0 && !loading">
+            <div class="empty-state">
+              <i class="fa-solid fa-folder-open"></i>
+              <h3>No projects found</h3>
+              <p>Try searching for a different keyword or resetting filters.</p>
+            </div>
+          </template>
         </div>
       </div>
     </section>
 
-    <!-- Skills Matrix Section -->
-    <section class="section" id="skills">
+    <!-- Skills Matrix Section (Alpine.js State) -->
+    <section class="section" id="skills" x-data="skillsApp()" x-init="fetchSkills('frontend')">
       <div class="container">
         <div class="section-header">
           <span class="section-tag">Capabilities</span>
           <h2 class="section-title glitch-hover" data-text="Technical Expertise">Technical Expertise</h2>
-          <p class="section-desc">Interactive tabbed skills matrix swapping server partials on demand.</p>
+          <p class="section-desc">Interactive tabbed skills matrix swapping JSON endpoints reactively.</p>
         </div>
 
         <!-- Skills Navigation Tabs -->
         <div class="skills-nav">
-          <button class="skills-tab-btn active" hx-get="/api/skills?category=frontend" hx-target="#skills-grid-target" hx-swap="innerHTML">
+          <button class="skills-tab-btn" :class="{ 'active': activeCategory === 'frontend' }" @click="selectCategory('frontend')">
             <i class="fa-solid fa-code"></i> Frontend & Hypermedia
           </button>
-          <button class="skills-tab-btn" hx-get="/api/skills?category=backend" hx-target="#skills-grid-target" hx-swap="innerHTML">
+          <button class="skills-tab-btn" :class="{ 'active': activeCategory === 'backend' }" @click="selectCategory('backend')">
             <i class="fa-solid fa-server"></i> Backend & Distributed
           </button>
-          <button class="skills-tab-btn" hx-get="/api/skills?category=devops" hx-target="#skills-grid-target" hx-swap="innerHTML">
+          <button class="skills-tab-btn" :class="{ 'active': activeCategory === 'devops' }" @click="selectCategory('devops')">
             <i class="fa-solid fa-cloud"></i> DevOps & Cloud
           </button>
-          <button class="skills-tab-btn" hx-get="/api/skills?category=architecture" hx-target="#skills-grid-target" hx-swap="innerHTML">
+          <button class="skills-tab-btn" :class="{ 'active': activeCategory === 'architecture' }" @click="selectCategory('architecture')">
             <i class="fa-solid fa-sitemap"></i> System Architecture
           </button>
         </div>
 
-        <!-- Skills Grid Target -->
-        <div id="skills-grid-target" hx-get="/api/skills?category=frontend" hx-trigger="load" hx-swap="innerHTML">
-          <!-- Server renders skill matrix partial here -->
+        <!-- Skills Grid Container -->
+        <div class="skills-grid-container" x-show="skillsGroup">
+          <div class="category-info">
+            <h3 x-text="skillsGroup.title"></h3>
+            <p x-text="skillsGroup.description"></p>
+          </div>
+          <div class="skill-cards">
+            <template x-for="item in skillsGroup.items" :key="item.name">
+              <div class="skill-card">
+                <div class="skill-card-header">
+                  <div class="skill-icon"><i class="fa-solid" :class="item.icon"></i></div>
+                  <div class="skill-titles">
+                    <h4 x-text="item.name"></h4>
+                    <span class="skill-exp" x-text="item.experience + ' experience'"></span>
+                  </div>
+                  <span class="skill-pct" x-text="item.level + '%'"></span>
+                </div>
+                <div class="skill-bar-bg">
+                  <div class="skill-bar-fill" :style="'width: ' + item.level + '%'"></div>
+                </div>
+              </div>
+            </template>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Articles & Technical Writings Section -->
-    <section class="section" id="articles">
+    <!-- Articles & Technical Writings Section (Alpine.js State) -->
+    <section class="section" id="articles" x-data="articlesApp()" x-init="fetchArticles()">
       <div class="container">
         <div class="section-header">
           <span class="section-tag">Publications</span>
           <h2 class="section-title glitch-hover" data-text="Technical Essays">Technical Essays</h2>
-          <p class="section-desc">Infinite pagination powered by HTMX (`hx-get="/api/articles?page=..."`).</p>
+          <p class="section-desc">Paginated articles feed rendered with Alpine.js (`x-for` & Go JSON APIs).</p>
         </div>
 
-        <!-- Articles Feed Target -->
-        <div id="articles-feed" class="articles-feed" hx-get="/api/articles?page=1" hx-trigger="load" hx-swap="innerHTML">
-          <!-- Initial articles list loaded via HTMX -->
+        <!-- Articles Feed -->
+        <div class="articles-feed">
+          <template x-for="article in articles" :key="article.id">
+            <article class="article-card">
+              <div class="article-meta">
+                <span class="tag tag-outline" x-text="article.category"></span>
+                <span class="article-date"><i class="fa-regular fa-calendar"></i> <span x-text="article.date"></span></span>
+                <span class="article-time"><i class="fa-regular fa-clock"></i> <span x-text="article.readTime"></span></span>
+              </div>
+              <h3 class="article-title" x-text="article.title"></h3>
+              <p class="article-snippet" x-text="article.snippet"></p>
+              <div class="article-footer">
+                <div class="card-tags">
+                  <template x-for="t in article.tags" :key="t">
+                    <span class="tag tag-sm" x-text="t"></span>
+                  </template>
+                </div>
+                <a :href="article.link" class="read-more-link">Read Article <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </article>
+          </template>
+
+          <div class="load-more-wrapper" x-show="hasMore">
+            <button class="btn btn-secondary" @click="loadMore()" :disabled="loading">
+              <i class="fa-solid fa-arrows-rotate"></i> 
+              <span x-text="loading ? 'Loading...' : 'Load More Articles (' + remaining + ' remaining)'"></span>
+            </button>
+          </div>
         </div>
       </div>
     </section>
 
-    <!-- Contact Form Section -->
-    <section class="section" id="contact">
+    <!-- Contact Form Section (Alpine.js State) -->
+    <section class="section" id="contact" x-data="contactApp()">
       <div class="container">
         <div class="contact-container">
           <div class="contact-info">
             <span class="section-tag">Let's Connect</span>
             <h3 class="glitch-hover" data-text="Start a Conversation">Start a Conversation</h3>
-            <p>Interested in collaborating on high-throughput backend architecture, Rust/Go systems, or hypermedia-driven web applications?</p>
+            <p>Interested in collaborating on high-throughput backend architecture, Go/Rust systems, or Alpine.js reactive web applications?</p>
 
             <div class="contact-methods">
               <div class="method-item">
@@ -264,39 +348,57 @@
             </div>
           </div>
 
-          <!-- Asynchronous HTMX Form -->
-          <form id="contact-form" 
-                hx-post="/api/contact" 
-                hx-target="#contact-response" 
-                hx-indicator="#form-spinner" 
-                class="contact-form">
+          <!-- Asynchronous Alpine.js Form -->
+          <form class="contact-form" @submit.prevent="submitForm()">
             
-            <div id="contact-response"></div>
+            <template x-if="successMessage">
+              <div class="alert alert-success">
+                <div class="alert-icon"><i class="fa-solid fa-circle-check"></i></div>
+                <div>
+                  <h4>Message Sent Successfully!</h4>
+                  <p x-text="successMessage"></p>
+                </div>
+              </div>
+            </template>
+
+            <template x-if="errors.length > 0">
+              <div class="alert alert-error">
+                <div class="alert-icon"><i class="fa-solid fa-circle-exclamation"></i></div>
+                <div>
+                  <h4>Submission Error</h4>
+                  <ul>
+                    <template x-for="err in errors" :key="err">
+                      <li x-text="err"></li>
+                    </template>
+                  </ul>
+                </div>
+              </div>
+            </template>
 
             <div class="form-group">
               <label for="name">Your Name</label>
-              <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Sarah Connor" required />
+              <input type="text" id="name" x-model="form.name" class="form-control" placeholder="e.g. Sarah Connor" required />
             </div>
 
             <div class="form-group">
               <label for="email">Email Address</label>
-              <input type="email" id="email" name="email" class="form-control" placeholder="e.g. sarah@cyberdyne.com" required />
+              <input type="email" id="email" x-model="form.email" class="form-control" placeholder="e.g. sarah@cyberdyne.com" required />
             </div>
 
             <div class="form-group">
               <label for="subject">Subject</label>
-              <input type="text" id="subject" name="subject" class="form-control" placeholder="Project Consulting / Architecture" />
+              <input type="text" id="subject" x-model="form.subject" class="form-control" placeholder="Project Consulting / Architecture" />
             </div>
 
             <div class="form-group">
               <label for="message">Message</label>
-              <textarea id="message" name="message" class="form-control" placeholder="Tell me about your project scope..." required></textarea>
+              <textarea id="message" x-model="form.message" class="form-control" placeholder="Tell me about your project scope..." required></textarea>
             </div>
 
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn btn-primary" :disabled="loading">
               <span>Send Message</span>
               <i class="fa-solid fa-paper-plane"></i>
-              <span id="form-spinner" class="htmx-indicator spinner"></span>
+              <span class="spinner" x-show="loading" x-cloak></span>
             </button>
           </form>
         </div>
@@ -305,14 +407,79 @@
 
   </main>
 
-  <!-- Modal Container Root (HTMX swaps detail dialogs here) -->
-  <div id="modal-container"></div>
+  <!-- Modal Container Overlay (Alpine.js State) -->
+  <div x-data="modalApp()" 
+       @open-modal.window="openModal($event.detail)" 
+       @keydown.escape.window="close()" 
+       x-show="open" 
+       x-cloak>
+    <div class="modal-overlay" @click="close()">
+      <div class="modal-dialog" @click.stop x-show="open" x-transition>
+        <template x-if="project">
+          <div>
+            <header class="modal-header">
+              <div>
+                <span class="tag tag-accent" x-text="project.category"></span>
+                <h2 class="modal-title" x-text="project.title"></h2>
+              </div>
+              <button class="modal-close-btn" @click="close()">&times;</button>
+            </header>
+            <div class="modal-body">
+              <img :src="project.image" :alt="project.title" class="modal-banner-img" />
+              
+              <div class="modal-stats">
+                <div class="stat-box">
+                  <i class="fa-regular fa-star"></i>
+                  <span><strong x-text="project.stars"></strong> GitHub Stars</span>
+                </div>
+                <div class="stat-box">
+                  <i class="fa-solid fa-code-fork"></i>
+                  <span><strong x-text="project.forks"></strong> Forks</span>
+                </div>
+                <div class="stat-box">
+                  <i class="fa-solid fa-gauge"></i>
+                  <span><strong x-text="project.metrics"></strong> Key Metric</span>
+                </div>
+              </div>
+
+              <h4 class="section-subtitle">Architecture Overview</h4>
+              <p class="modal-desc" x-text="project.description"></p>
+
+              <h4 class="section-subtitle">Technologies & Tools</h4>
+              <div class="card-tags">
+                <template x-for="t in project.tags" :key="t">
+                  <span class="tag" x-text="t"></span>
+                </template>
+              </div>
+
+              <template x-if="project.codeHighlight">
+                <div>
+                  <h4 class="section-subtitle">Core Implementation Snippet</h4>
+                  <div class="code-block-wrapper">
+                    <pre class="code-block"><code x-text="project.codeHighlight"></code></pre>
+                  </div>
+                </div>
+              </template>
+            </div>
+            <footer class="modal-footer">
+              <a :href="project.githubUrl" target="_blank" rel="noopener" class="btn btn-secondary">
+                <i class="fa-brands fa-github"></i> Repository
+              </a>
+              <a :href="project.liveUrl" target="_blank" rel="noopener" class="btn btn-primary">
+                <i class="fa-solid fa-paper-plane"></i> Live System
+              </a>
+            </footer>
+          </div>
+        </template>
+      </div>
+    </div>
+  </div>
 
   <!-- Footer -->
   <footer class="footer">
     <div class="container footer-content">
       <div>
-        <p>&copy; 2026 Alex Mercer. Built with HTML5, Vanilla CSS, and <a href="https://htmx.org" target="_blank" style="color: var(--accent-cyan);">HTMX</a>.</p>
+        <p>&copy; 2026 Alex Mercer. Built with Go & <a href="https://alpinejs.dev" target="_blank" style="color: var(--accent-cyan);">Alpine.js</a>.</p>
       </div>
 
       <div class="footer-socials">
@@ -329,7 +496,7 @@
     </div>
   </footer>
 
-  <!-- Custom Client Script -->
+  <!-- Custom Client Script & Alpine Components -->
   <script src="/js/main.js"></script>
 </body>
 </html>

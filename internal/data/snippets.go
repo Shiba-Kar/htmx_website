@@ -1,8 +1,6 @@
 package data
 
 import (
-	"fmt"
-	"html"
 	"strings"
 )
 
@@ -14,47 +12,50 @@ type SnippetItem struct {
 }
 
 var SnippetsMap = map[string]SnippetItem{
-	"htmx": {
-		Lang:     "HTML / HTMX",
-		Title:    "Server-Driven Hypermedia Pattern",
+	"alpine": {
+		Lang:     "HTML / Alpine.js",
+		Title:    "Reactive Declarative State Component",
 		Filename: "active_search.html",
-		Code: `<!-- Realtime Active Search with HTMX & Go Server -->
-<input type="text" 
-       name="query" 
-       placeholder="Search repository..." 
-       hx-get="/api/projects" 
-       hx-trigger="keyup changed delay:250ms, search" 
-       hx-target="#project-grid" 
-       hx-indicator="#loading-spinner"
-       class="search-input" />
+		Code: `<!-- Realtime Active Search with Alpine.js & Go JSON API -->
+<div x-data="{ query: '', category: 'all', projects: [], loading: false }"
+     x-init="$watch('query', () => fetchProjects()); $watch('category', () => fetchProjects()); fetchProjects()">
+  
+  <input type="text" 
+         x-model.debounce.250ms="query" 
+         placeholder="Search repository..." 
+         class="search-input" />
 
-<div id="loading-spinner" class="htmx-indicator spinner"></div>
-<div id="project-grid">
-  <!-- Go server returns updated HTML list snippet here -->
+  <template x-if="loading">
+    <div class="spinner"></div>
+  </template>
+
+  <div class="projects-grid">
+    <template x-for="project in projects" :key="project.id">
+      <article class="project-card" x-text="project.title"></article>
+    </template>
+  </div>
 </div>`,
 	},
 	"go": {
 		Lang:     "Go",
-		Title:    "High-Performance Go Net/HTTP Server & Router",
+		Title:    "High-Performance Go Net/HTTP JSON API Router",
 		Filename: "server.go",
-		Code: `// Native Go 1.26 HTTP Router & HTMX Handler
+		Code: `// Native Go 1.26 HTTP Router & Alpine.js JSON API Handler
 package main
 
 import (
-    "fmt"
+    "encoding/json"
     "net/http"
-    "time"
 )
 
-func HandleProjects(w http.ResponseWriter, r *http.Request) {
+func HandleProjectsJSON(w http.ResponseWriter, r *http.Request) {
     category := r.URL.Query().Get("category")
     query := r.URL.Query().Get("query")
     
     projects := data.FilterProjects(category, query)
-    htmlPartial := data.RenderProjectCardsHTML(projects)
     
-    w.Header().Set("Content-Type", "text/html; charset=utf-8")
-    w.Write([]byte(htmlPartial))
+    w.Header().Set("Content-Type", "application/json")
+    json.NewEncoder(w).Encode(projects)
 }`,
 	},
 	"rust": {
@@ -106,23 +107,11 @@ async def stream_inference(ws: WebSocket):
 	},
 }
 
-func RenderCodeSnippetHTML(langKey string) string {
+func GetCodeSnippet(langKey string) SnippetItem {
 	key := strings.ToLower(strings.TrimSpace(langKey))
 	item, ok := SnippetsMap[key]
 	if !ok {
-		item = SnippetsMap["htmx"]
+		item = SnippetsMap["alpine"]
 	}
-
-	return fmt.Sprintf(`
-	<div class="terminal-content">
-		<div class="terminal-subheader">
-			<span class="file-name"><i class="fa-regular fa-file-code"></i> %s</span>
-			<span class="file-tag">%s</span>
-		</div>
-		<pre class="terminal-code"><code>%s</code></pre>
-	</div>`,
-		html.EscapeString(item.Filename),
-		html.EscapeString(item.Lang),
-		html.EscapeString(item.Code),
-	)
+	return item
 }

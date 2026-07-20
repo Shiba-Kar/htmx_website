@@ -1,8 +1,6 @@
 package data
 
 import (
-	"fmt"
-	"html"
 	"strings"
 )
 
@@ -54,32 +52,28 @@ pub async fn flush_memtable(&self, memtable: Arc<MemTable>) -> Result<SSTableId>
 }`,
 	},
 	{
-		ID:          "htmx-nebula",
-		Title:       "HTMX Nebula UI System",
+		ID:          "alpine-nebula",
+		Title:       "Alpine Nebula UI System",
 		Category:    "Fullstack",
-		Tags:        []string{"HTMX", "Go", "Vanilla CSS", "SSE"},
-		Summary:     "Server-driven hypermedia dashboard system with real-time SSE streaming & zero JS client bundle.",
-		Description: "Demonstrates how to replace heavy client-side SPAs with hypermedia-driven architecture using HTMX, Server-Sent Events (SSE), and custom server partials for streaming metrics.",
+		Tags:        []string{"Alpine.js", "Go", "Vanilla CSS", "SSE"},
+		Summary:     "Reactive client dashboard system with Alpine.js state management & Go backend.",
+		Description: "Demonstrates high-performance client interactivity powered by Alpine.js declarative directives, real-time metrics streaming, and clean RESTful Go endpoints.",
 		Stars:       2840,
 		Forks:       310,
-		Metrics:     "0kb client JS framework / 99 Lighthouse",
+		Metrics:     "Reactive Alpine.js / 99 Lighthouse",
 		Image:       "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80",
-		GithubURL:   "https://github.com/example/htmx-nebula",
-		LiveURL:     "https://htmx-nebula.dev",
+		GithubURL:   "https://github.com/example/alpine-nebula",
+		LiveURL:     "https://alpine-nebula.dev",
 		Featured:    true,
-		CodeHighlight: `<!-- HTMX Dynamic Dashboard Partial -->
-<div hx-get="/api/metrics/live" 
-     hx-trigger="every 2s" 
-     hx-target="#live-chart" 
-     hx-swap="innerHTML" 
+		CodeHighlight: `<!-- Alpine.js Dynamic Reactive Card -->
+<div x-data="{ metrics: {} }" 
+     x-init="setInterval(async () => metrics = await (await fetch('/api/stats')).json(), 2000)" 
      class="dashboard-card">
   <div class="card-header">
     <span class="live-indicator pulse"></span>
     <h3>Realtime Throughput</h3>
   </div>
-  <div id="live-chart">
-    <!-- Server-rendered inline SVG sparkline swapped every 2s -->
-  </div>
+  <div class="metric-value" x-text="metrics.commits + ' Commits'"></div>
 </div>`,
 	},
 	{
@@ -210,75 +204,4 @@ func FilterProjects(category, query string) []Project {
 		}
 	}
 	return result
-}
-
-func RenderProjectCardsHTML(items []Project) string {
-	if len(items) == 0 {
-		return `
-			<div class="empty-state">
-				<i class="fa-solid fa-folder-open"></i>
-				<h3>No projects found</h3>
-				<p>Try searching for a different keyword or resetting filters.</p>
-			</div>`
-	}
-
-	var sb strings.Builder
-	for _, project := range items {
-		var tagsHTML strings.Builder
-		for _, tag := range project.Tags {
-			tagsHTML.WriteString(fmt.Sprintf(`<span class="tag">%s</span>`, html.EscapeString(tag)))
-		}
-
-		cardHTML := fmt.Sprintf(`
-		<article class="project-card spotlight-card" id="project-%s">
-			<div class="card-image-wrapper">
-				<img src="%s" alt="%s" loading="lazy" />
-				<div class="card-badge">%s</div>
-			</div>
-			<div class="card-content">
-				<div class="card-meta">
-					<span><i class="fa-regular fa-star"></i> %d</span>
-					<span><i class="fa-solid fa-code-fork"></i> %d</span>
-					<span class="metric-pill"><i class="fa-solid fa-bolt"></i> %s</span>
-				</div>
-				<h3 class="card-title">%s</h3>
-				<p class="card-summary">%s</p>
-				<div class="card-tags">
-					%s
-				</div>
-				<div class="card-actions">
-					<button class="btn btn-secondary btn-sm"
-							hx-get="/api/project-detail/%s"
-							hx-target="#modal-container"
-							hx-swap="innerHTML">
-						<i class="fa-solid fa-expand"></i> Details
-					</button>
-					<a href="%s" target="_blank" rel="noopener" class="btn btn-icon btn-sm" title="View Source Code">
-						<i class="fa-brands fa-github"></i>
-					</a>
-					<a href="%s" target="_blank" rel="noopener" class="btn btn-icon btn-sm" title="Live Preview">
-						<i class="fa-solid fa-arrow-up-right-from-square"></i>
-					</a>
-				</div>
-			</div>
-		</article>`,
-			project.ID,
-			project.Image,
-			html.EscapeString(project.Title),
-			html.EscapeString(project.Category),
-			project.Stars,
-			project.Forks,
-			html.EscapeString(project.Metrics),
-			html.EscapeString(project.Title),
-			html.EscapeString(project.Summary),
-			tagsHTML.String(),
-			project.ID,
-			project.GithubURL,
-			project.LiveURL,
-		)
-
-		sb.WriteString(cardHTML)
-	}
-
-	return sb.String()
 }

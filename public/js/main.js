@@ -1,18 +1,207 @@
 /* ==========================================================================
-   Ultra-Futuristic Client Micro-Interactions, Web Audio Synth & Dual Cursor
+   Alpine.js Reactive Component Stores, Web Audio Synth & Micro-Interactions
    ========================================================================== */
 
+document.addEventListener('alpine:init', () => {
+  // Global App Shell State
+  Alpine.data('portfolioApp', () => ({
+    setTheme(theme) {
+      if (theme === 'cyan') {
+        document.body.removeAttribute('data-theme');
+      } else {
+        document.body.setAttribute('data-theme', theme);
+      }
+      playSynthBeep(650, 0.05);
+    }
+  }));
+
+  // Hero Live Stats State
+  Alpine.data('statsApp', () => ({
+    stats: { commits: 1480, uptime: '99.99%', activeProjects: 14 },
+    async initStats() {
+      await this.fetchStats();
+      setInterval(() => this.fetchStats(), 15000);
+    },
+    async fetchStats() {
+      try {
+        const res = await fetch('/api/stats');
+        if (res.ok) {
+          this.stats = await res.json();
+        }
+      } catch (err) {
+        console.error('Error fetching stats:', err);
+      }
+    }
+  }));
+
+  // Terminal Code Viewer State
+  Alpine.data('terminalApp', () => ({
+    activeLang: 'alpine',
+    snippet: null,
+    async selectLang(lang) {
+      this.activeLang = lang;
+      await this.fetchSnippet(lang);
+      playSynthBeep(750, 0.04);
+    },
+    async fetchSnippet(lang) {
+      try {
+        const res = await fetch(`/api/code-snippet/${lang}`);
+        if (res.ok) {
+          this.snippet = await res.json();
+        }
+      } catch (err) {
+        console.error('Error fetching code snippet:', err);
+      }
+    }
+  }));
+
+  // Projects Grid & Active Search State
+  Alpine.data('projectsApp', () => ({
+    query: '',
+    category: 'all',
+    projects: [],
+    loading: false,
+    init() {
+      this.$watch('query', () => this.fetchProjects());
+      this.$watch('category', () => this.fetchProjects());
+    },
+    setCategory(cat) {
+      this.category = cat;
+      playSynthBeep(700, 0.04);
+    },
+    async fetchProjects() {
+      this.loading = true;
+      try {
+        const url = `/api/projects?category=${encodeURIComponent(this.category)}&query=${encodeURIComponent(this.query)}`;
+        const res = await fetch(url);
+        if (res.ok) {
+          this.projects = await res.json();
+        }
+      } catch (err) {
+        console.error('Error fetching projects:', err);
+      } finally {
+        this.loading = false;
+      }
+    }
+  }));
+
+  // Skills Matrix State
+  Alpine.data('skillsApp', () => ({
+    activeCategory: 'frontend',
+    skillsGroup: null,
+    async selectCategory(cat) {
+      this.activeCategory = cat;
+      await this.fetchSkills(cat);
+      playSynthBeep(720, 0.04);
+    },
+    async fetchSkills(cat) {
+      try {
+        const res = await fetch(`/api/skills?category=${encodeURIComponent(cat)}`);
+        if (res.ok) {
+          this.skillsGroup = await res.json();
+        }
+      } catch (err) {
+        console.error('Error fetching skills:', err);
+      }
+    }
+  }));
+
+  // Articles Feed & Load More State
+  Alpine.data('articlesApp', () => ({
+    articles: [],
+    page: 1,
+    hasMore: true,
+    remaining: 0,
+    loading: false,
+    async fetchArticles() {
+      this.loading = true;
+      try {
+        const res = await fetch(`/api/articles?page=${this.page}`);
+        if (res.ok) {
+          const data = await res.json();
+          this.articles = [...this.articles, ...data.articles];
+          this.hasMore = data.hasMore;
+          this.remaining = data.remaining;
+        }
+      } catch (err) {
+        console.error('Error fetching articles:', err);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async loadMore() {
+      if (!this.hasMore || this.loading) return;
+      this.page++;
+      await this.fetchArticles();
+      playSynthBeep(680, 0.04);
+    }
+  }));
+
+  // Contact Form State
+  Alpine.data('contactApp', () => ({
+    form: { name: '', email: '', subject: '', message: '' },
+    successMessage: null,
+    errors: [],
+    loading: false,
+    async submitForm() {
+      this.loading = true;
+      this.successMessage = null;
+      this.errors = [];
+      try {
+        const res = await fetch('/api/contact', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(this.form)
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+          this.successMessage = data.message;
+          this.form = { name: '', email: '', subject: '', message: '' };
+          playSynthBeep(900, 0.1);
+        } else {
+          this.errors = data.errors || ['Form submission error.'];
+          playSynthBeep(400, 0.1);
+        }
+      } catch (err) {
+        this.errors = ['Network connection error.'];
+      } finally {
+        this.loading = false;
+      }
+    }
+  }));
+
+  // Modal Dialog Overlay State
+  Alpine.data('modalApp', () => ({
+    open: false,
+    project: null,
+    async openModal(id) {
+      try {
+        const res = await fetch(`/api/project-detail/${id}`);
+        if (res.ok) {
+          this.project = await res.json();
+          this.open = true;
+          playSynthBeep(800, 0.05);
+        }
+      } catch (err) {
+        console.error('Error opening modal:', err);
+      }
+    },
+    close() {
+      this.open = false;
+      this.project = null;
+    }
+  }));
+});
+
+// Non-Alpine DOM & Micro-Interaction Enhancements
 document.addEventListener('DOMContentLoaded', () => {
   initDualCursor();
   initParticleCanvas();
-  initThemePicker();
   initTypingHeadline();
   initWebAudioSynth();
-  initCategoryTabToggle();
   initMouseSpotlight();
   initScrollReveal();
   initCardTiltEffect();
-  initHtmxListeners();
 });
 
 // Interactive Dual-Ring Neon Cursor
@@ -44,7 +233,6 @@ function initDualCursor() {
 
   renderRing();
 
-  // Hover states for interactive elements
   const hoverSelectors = 'a, button, input, textarea, .cat-btn, .skills-tab-btn, .terminal-tab, .project-card';
   document.addEventListener('mouseover', (e) => {
     if (e.target.closest(hoverSelectors)) {
@@ -59,7 +247,7 @@ function initDualCursor() {
   });
 }
 
-// Particle Matrix Canvas Background with Aurora Waves
+// Particle Canvas Backdrop
 function initParticleCanvas() {
   const canvas = document.getElementById('bg-canvas');
   if (!canvas) return;
@@ -96,8 +284,6 @@ function initParticleCanvas() {
 
   function animate() {
     ctx.clearRect(0, 0, width, height);
-
-    // Dynamic theme color lookup
     const accentColor = getComputedStyle(document.body).getPropertyValue('--accent-cyan').trim() || '#00f2fe';
 
     particles.forEach((p, i) => {
@@ -107,7 +293,6 @@ function initParticleCanvas() {
       if (p.x < 0 || p.x > width) p.vx *= -1;
       if (p.y < 0 || p.y > height) p.vy *= -1;
 
-      // Mouse interactive repelling
       if (mouse.x !== null && mouse.y !== null) {
         const dx = mouse.x - p.x;
         const dy = mouse.y - p.y;
@@ -126,7 +311,6 @@ function initParticleCanvas() {
       ctx.globalAlpha = p.alpha;
       ctx.fill();
 
-      // Connect nearby particles
       for (let j = i + 1; j < particles.length; j++) {
         const p2 = particles[j];
         const dx = p.x - p2.x;
@@ -152,31 +336,15 @@ function initParticleCanvas() {
   animate();
 }
 
-// Live Dynamic Theme Accent Switcher (Cyan, Magenta, Emerald, Amber)
-function initThemePicker() {
-  const dots = document.querySelectorAll('.theme-dot');
-  dots.forEach(dot => {
-    dot.addEventListener('click', () => {
-      const theme = dot.getAttribute('data-theme-name');
-      if (theme === 'cyan') {
-        document.body.removeAttribute('data-theme');
-      } else {
-        document.body.setAttribute('data-theme', theme);
-      }
-      playSynthBeep(650, 0.05);
-    });
-  });
-}
-
 // Dynamic Typing Headline Animation
 function initTypingHeadline() {
   const el = document.getElementById('typing-text');
   if (!el) return;
 
   const phrases = [
-    "Fast & Server-Driven Digital Systems",
-    "Low-Latency Rust Storage Engines",
-    "Zero-Bundle HTMX Hypermedia Systems",
+    "Fast & Alpine.js Reactive Systems",
+    "Low-Latency Go & Rust Backends",
+    "Zero-Bloat Declarative Web UI",
     "High-Throughput Distributed Services"
   ];
 
@@ -198,7 +366,7 @@ function initTypingHeadline() {
     let delay = isDeleting ? 40 : 80;
 
     if (!isDeleting && charIdx === currentPhrase.length) {
-      delay = 2200; // Pause at full phrase
+      delay = 2200;
       isDeleting = true;
     } else if (isDeleting && charIdx === 0) {
       isDeleting = false;
@@ -212,7 +380,7 @@ function initTypingHeadline() {
   type();
 }
 
-// Web Audio API Sci-Fi Synthesizer Sound Generator
+// Web Audio API Synthesizer
 let audioCtx = null;
 let soundEnabled = true;
 
@@ -227,15 +395,6 @@ function initWebAudioSynth() {
       '<i class="fa-solid fa-volume-xmark"></i>';
     toggleBtn.classList.toggle('muted', !soundEnabled);
     if (soundEnabled) playSynthBeep(880, 0.08);
-  });
-
-  // Attach sound triggers to interactive buttons
-  document.addEventListener('click', (e) => {
-    if (
-      e.target.closest('.btn, .cat-btn, .skills-tab-btn, .terminal-tab, .nav-link, .modal-close-btn')
-    ) {
-      playSynthBeep(700, 0.04);
-    }
   });
 }
 
@@ -265,11 +424,11 @@ function playSynthBeep(freq = 600, duration = 0.05) {
     osc.start();
     osc.stop(audioCtx.currentTime + duration);
   } catch (err) {
-    // Ignore audio context autoplay restrictions
+    // Ignore audio autoplay restrictions
   }
 }
 
-// Mouse Spotlight Gradient Tracking across Cards
+// Mouse Spotlight Tracking
 function initMouseSpotlight() {
   document.addEventListener('mousemove', (e) => {
     const cards = document.querySelectorAll('.project-card, .spotlight-card, .skill-card, .article-card');
@@ -283,7 +442,7 @@ function initMouseSpotlight() {
   });
 }
 
-// Interactive 3D Card Tilt Effect
+// Interactive 3D Card Tilt
 function initCardTiltEffect() {
   document.addEventListener('mousemove', (e) => {
     const cards = document.querySelectorAll('.project-card');
@@ -309,7 +468,7 @@ function initCardTiltEffect() {
   });
 }
 
-// Scroll Reveal Intersection Observer
+// Scroll Reveal Observer
 function initScrollReveal() {
   const elements = document.querySelectorAll('.section-header, .project-filters, .contact-container, .skills-grid-container');
   elements.forEach(el => el.classList.add('reveal'));
@@ -323,74 +482,4 @@ function initScrollReveal() {
   }, { threshold: 0.15 });
 
   elements.forEach(el => observer.observe(el));
-}
-
-// Active Tab Button Toggle Helper
-function initCategoryTabToggle() {
-  document.addEventListener('click', (e) => {
-    // Project Category Buttons
-    if (e.target.matches('.cat-btn')) {
-      const parent = e.target.closest('.category-tabs');
-      if (parent) {
-        parent.querySelectorAll('.cat-btn').forEach(btn => btn.classList.remove('active'));
-        e.target.classList.add('active');
-      }
-    }
-
-    // Skills Category Buttons
-    if (e.target.matches('.skills-tab-btn')) {
-      const parent = e.target.closest('.skills-nav');
-      if (parent) {
-        parent.querySelectorAll('.skills-tab-btn').forEach(btn => btn.classList.remove('active'));
-        e.target.classList.add('active');
-      }
-    }
-
-    // Code Terminal Tabs
-    if (e.target.matches('.terminal-tab')) {
-      const parent = e.target.closest('.terminal-tabs');
-      if (parent) {
-        parent.querySelectorAll('.terminal-tab').forEach(btn => btn.classList.remove('active'));
-        e.target.classList.add('active');
-      }
-    }
-  });
-}
-
-// Modal Dismiss Helpers
-function closeModal(event) {
-  if (event.target.classList.contains('modal-overlay')) {
-    closeModalDirect();
-  }
-}
-
-function closeModalDirect() {
-  const container = document.getElementById('modal-container');
-  if (container) {
-    container.innerHTML = '';
-  }
-}
-
-// Global ESC key listener to close modal
-document.addEventListener('keydown', (e) => {
-  if (e.key === 'Escape') {
-    closeModalDirect();
-  }
-});
-
-// HTMX Lifecycle Event Listeners
-function initHtmxListeners() {
-  // Clear contact form on successful response
-  document.addEventListener('htmx:afterOnLoad', (evt) => {
-    if (evt.detail.target.id === 'contact-response' && evt.detail.xhr.status === 200) {
-      const form = document.getElementById('contact-form');
-      if (form) form.reset();
-    }
-  });
-
-  // Re-apply spotlight classes when HTMX injects new project cards
-  document.addEventListener('htmx:afterSwap', (evt) => {
-    const cards = evt.detail.target.querySelectorAll('.project-card');
-    cards.forEach(card => card.classList.add('spotlight-card'));
-  });
 }
