@@ -17,13 +17,17 @@
 </head>
 <body>
 
+  <!-- Custom Dual-Ring Neon Cursor -->
+  <div class="custom-cursor" id="custom-cursor"></div>
+  <div class="custom-cursor-ring" id="custom-cursor-ring"></div>
+
   <!-- Particle Backdrop Canvas -->
   <canvas id="bg-canvas"></canvas>
 
   <!-- Navigation Bar -->
   <header class="navbar">
     <div class="container nav-container">
-      <a href="#" class="brand-logo">
+      <a href="#" class="brand-logo glitch-hover" data-text="AlexMercer">
         <div class="logo-icon"><i class="fa-solid fa-code"></i></div>
         <span>Alex<span class="gradient-text">Mercer</span></span>
       </a>
@@ -40,7 +44,20 @@
       </nav>
 
       <div class="nav-actions">
-        <a href="https://github.com/bigskysoftware/htmx" target="_blank" rel="noopener" class="btn btn-icon" title="View HTMX Repository">
+        <!-- Live Accent Theme Switcher -->
+        <div class="theme-picker" title="Switch Accent Theme">
+          <div class="theme-dot cyan" data-theme-name="cyan" title="Cyber Cyan"></div>
+          <div class="theme-dot magenta" data-theme-name="magenta" title="Neon Magenta"></div>
+          <div class="theme-dot emerald" data-theme-name="emerald" title="Matrix Emerald"></div>
+          <div class="theme-dot amber" data-theme-name="amber" title="Solar Amber"></div>
+        </div>
+
+        <!-- Web Audio Interface Sound Toggle -->
+        <button id="audio-toggle" class="btn btn-icon btn-sm" title="Toggle Synth Sound Effects">
+          <i class="fa-solid fa-volume-high"></i>
+        </button>
+
+        <a href="https://github.com/Shiba-Kar/htmx_website" target="_blank" rel="noopener" class="btn btn-icon" title="View Repository on GitHub">
           <i class="fa-brands fa-github"></i>
         </a>
         <a href="#contact" class="btn btn-primary btn-sm">
@@ -59,15 +76,16 @@
         <div class="hero-content">
           <div class="hero-pill">
             <span class="pulse-dot"></span>
-            <span>Hypermedia & Systems Engineer</span>
+            <span>Hypermedia & Systems Architect</span>
           </div>
 
           <h1 class="hero-title">
-            Architecting <span class="gradient-text">Fast & Server-Driven</span> Digital Systems
+            Architecting <br>
+            <span id="typing-text" class="typing-wrapper"></span>
           </h1>
 
           <p class="hero-subtitle">
-            I craft high-performance distributed backends in <strong>Rust & Go</strong>, and responsive zero-bloat web applications powered by <strong>HTMX</strong> hypermedia architecture.
+            I craft high-throughput distributed backends in <strong>Rust & Go</strong>, and responsive zero-bloat web applications powered by <strong>HTMX</strong> hypermedia architecture.
           </p>
 
           <div class="hero-cta">
@@ -117,8 +135,8 @@
       <div class="container">
         <div class="section-header">
           <span class="section-tag">Portfolio Showcase</span>
-          <h2 class="section-title">Featured Projects</h2>
-          <p class="section-desc">Real-time filtered view powered by HTMX server endpoints (`hx-get` with keyup delay search).</p>
+          <h2 class="section-title glitch-hover" data-text="Featured Projects">Featured Projects</h2>
+          <p class="section-desc">Real-time reactive view powered by HTMX server endpoints (`hx-get` with keyup delay search).</p>
         </div>
 
         <!-- Active Filter & Search Control Bar -->
@@ -167,7 +185,7 @@
       <div class="container">
         <div class="section-header">
           <span class="section-tag">Capabilities</span>
-          <h2 class="section-title">Technical Expertise</h2>
+          <h2 class="section-title glitch-hover" data-text="Technical Expertise">Technical Expertise</h2>
           <p class="section-desc">Interactive tabbed skills matrix swapping server partials on demand.</p>
         </div>
 
@@ -199,7 +217,7 @@
       <div class="container">
         <div class="section-header">
           <span class="section-tag">Publications</span>
-          <h2 class="section-title">Technical Essays & Articles</h2>
+          <h2 class="section-title glitch-hover" data-text="Technical Essays">Technical Essays</h2>
           <p class="section-desc">Infinite pagination powered by HTMX (`hx-get="/api/articles?page=..."`).</p>
         </div>
 
@@ -216,7 +234,7 @@
         <div class="contact-container">
           <div class="contact-info">
             <span class="section-tag">Let's Connect</span>
-            <h3>Start a Conversation</h3>
+            <h3 class="glitch-hover" data-text="Start a Conversation">Start a Conversation</h3>
             <p>Interested in collaborating on high-throughput backend architecture, Rust/Go systems, or hypermedia-driven web applications?</p>
 
             <div class="contact-methods">
@@ -231,8 +249,8 @@
               <div class="method-item">
                 <div class="method-icon"><i class="fa-brands fa-github"></i></div>
                 <div class="method-text">
-                  <h5>GitHub Profile</h5>
-                  <p>github.com/bigskysoftware/htmx</p>
+                  <h5>GitHub Repository</h5>
+                  <p>github.com/Shiba-Kar/htmx_website</p>
                 </div>
               </div>
 
@@ -298,7 +316,7 @@
       </div>
 
       <div class="footer-socials">
-        <a href="https://github.com/bigskysoftware/htmx" target="_blank" rel="noopener" class="btn btn-icon" title="GitHub">
+        <a href="https://github.com/Shiba-Kar/htmx_website" target="_blank" rel="noopener" class="btn btn-icon" title="GitHub">
           <i class="fa-brands fa-github"></i>
         </a>
         <a href="https://twitter.com" target="_blank" rel="noopener" class="btn btn-icon" title="Twitter / X">
