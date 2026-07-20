@@ -1,6 +1,18 @@
+# Go binary & builds
+htmx_website
+*.exe
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# Node / JS legacy
 node_modules/
+package-lock.json
+bun.lock
+
+# OS & Environment
 .DS_Store
 *.log
 .env
-bun.lock
-package-lock.json
