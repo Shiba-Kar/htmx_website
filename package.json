@@ -4,8 +4,8 @@
   "description": "A high-performance, interactive personal developer website built with HTMX, Node.js Express, and modern Vanilla CSS.",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "npx nodemon server.js"
+    "start": "bun server.js",
+    "dev": "bun nodemon server.js"
   },
   "keywords": [
     "htmx",
