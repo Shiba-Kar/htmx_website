@@ -27,7 +27,7 @@ function renderProjectCards(items) {
   }
 
   return items.map(project => `
-    <article class="project-card" id="project-${project.id}">
+    <article class="project-card spotlight-card" id="project-${project.id}">
       <div class="card-image-wrapper">
         <img src="${project.image}" alt="${project.title}" loading="lazy" />
         <div class="card-badge">${project.category}</div>
